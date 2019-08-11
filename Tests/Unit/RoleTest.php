@@ -13,35 +13,40 @@ class RoleTest extends TestCase
 {
     use DatabaseTransactions;
 
+    private $authUser;
+
+    function setUp(): void
+    {
+        parent::setUp();
+
+        $this->authUser = factory(User::class)->create();
+    }
+
     public function testCreateRole()
     {
-        $user = factory(User::class)->create();
         $data = factory(Role::class)->make()->toArray();
 
-        $this->actingAs($user, 'api')->json('post', 'v1/acl/roles', $data)
+        $this->actingAs($this->authUser, 'api')->json('post', env('INNERENT_API_PREFIX', 'v1').'/acl/roles', $data)
             ->assertStatus(201);
     }
 
     public function testListRoles()
     {
-        $user = factory(User::class)->create();
-        $this->actingAs($user, 'api')->json('get', 'v1/acl/roles')
+        $this->actingAs($this->authUser, 'api')->json('get', env('INNERENT_API_PREFIX', 'v1').'/acl/roles')
             ->assertStatus(200);
     }
 
     public function testShowRole()
     {
-        $user = factory(User::class)->create();
         $roleService = new RoleService(new RoleRepository(new Role()));
         $role = $roleService->make(factory(Role::class)->make()->toArray());
 
-        $this->actingAs($user, 'api')->json('get', 'v1/acl/roles/' . $role->id)
+        $this->actingAs($this->authUser, 'api')->json('get', env('INNERENT_API_PREFIX', 'v1').'/acl/roles/' . $role->id)
             ->assertStatus(200);
     }
 
     public function testUpdateRole()
     {
-        $user = factory(User::class)->create();
         $roleService = new RoleService(new RoleRepository(new Role()));
         $role = $roleService->make(factory(Role::class)->make()->toArray());
 
@@ -50,17 +55,16 @@ class RoleTest extends TestCase
         $roleUpdated = $roleService->make($newData)->toArray();
         $roleUpdated['id'] = $role->id;
 
-        $this->actingAs($user, 'api')->json('put', 'v1/acl/roles/' . $role->id, $newData)
+        $this->actingAs($this->authUser, 'api')->json('put', env('INNERENT_API_PREFIX', 'v1').'/acl/roles/' . $role->id, $newData)
             ->assertJsonFragment($roleUpdated)
             ->assertStatus(200);
     }
 
     public function testDeleteRole()
     {
-        $user = factory(User::class)->create();
         $roleService = new RoleService(new RoleRepository(new Role()));
         $role = $roleService->make(factory(Role::class)->make()->toArray());
 
-        $this->actingAs($user, 'api')->json('delete', 'v1/acl/roles/' . $role->id)->assertStatus(204);
+        $this->actingAs($this->authUser, 'api')->json('delete', env('INNERENT_API_PREFIX', 'v1').'/acl/roles/' . $role->id)->assertStatus(204);
     }
 }
