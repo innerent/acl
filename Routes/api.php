@@ -13,13 +13,15 @@ use Illuminate\Http\Request;
 |
 */
 
-/*Route::middleware('auth:api')->get('/acl', function (Request $request) {
-    return $request->user();
-});*/
-
 Route::group([
     'middleware' => 'auth:api',
     'prefix' => 'acl'
 ], function () {
     Route::apiResource('roles', 'RoleController');
+
+    Route::get('permissions', function () {
+        $permissions = \Spatie\Permission\Models\Permission::all()->toArray();
+
+        return response()->json($permissions, 200);
+    });
 });
