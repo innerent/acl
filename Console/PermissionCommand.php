@@ -96,7 +96,7 @@ class PermissionCommand extends Command
             } elseif (isset($permission['actions'])) {
                 $count += count($permission['actions']);
 
-                if (!isset($permission['strict']) || $permission['strict'] == false) {
+                if (! isset($permission['strict']) || $permission['strict'] == false) {
                     $count += $default;
                 }
             }

@@ -36,7 +36,7 @@ class RoleController extends Controller
     {
         $role = $this->roleService->get($role);
 
-        $this->authorize('view',  $role);
+        $this->authorize('view', $role);
 
         return response()->json($role->toArray(), 200);
     }
