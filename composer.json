@@ -1,6 +1,6 @@
 {
     "name": "innerent/acl",
-    "description": "",
+    "description": "A superset of the amazing spatie/laravel-permission package",
     "authors": [
         {
             "name": "Marcelo Barros da Silva",
