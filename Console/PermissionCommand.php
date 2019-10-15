@@ -22,14 +22,67 @@ class PermissionCommand extends Command
     protected $description = 'Seed permissions from config file';
 
     /**
-     * Execute the console command.
+     * Default actions for any non strict permission
      *
-     * @return mixed
+     * @var array
      */
-
     protected $defaultActions;
 
+    /**
+     * Execute the console command.
+     *
+     * @return void
+     */
     public function handle()
+    {
+        $this->migratePermissions();
+
+        $this->updateSuperUserPermissions();
+    }
+
+    /**
+     * List actions to specific permission
+     *
+     * @param $permission string|array
+     *
+     * @return array
+     */
+    private function getActions($permission)
+    {
+        if (isset($permission['strict']) && $permission['strict'] == true) {
+            return $permission['actions'];
+        } elseif (is_array($permission)) {
+            return array_merge($this->defaultActions, $permission['actions']);
+        } else {
+            return $this->defaultActions;
+        }
+    }
+
+    /**
+     * Count the number of unique permissions
+     *
+     */
+    private function countPermissions($permissions, $default)
+    {
+        $count = 0;
+
+        foreach($permissions as $permission) {
+
+            if (is_string($permission)) {
+                $count += $default;
+            } elseif (isset($permission['actions'])) {
+                $count += count($permission['actions']);
+
+                if (!isset($permission['strict']) || $permission['strict'] == false) {
+                    $count += $default;
+                }
+            }
+        }
+
+        return $count;
+    }
+
+    public function migratePermissions()
     {
         $this->defaultActions = config('acl.default_actions');
 
@@ -39,22 +92,14 @@ class PermissionCommand extends Command
 
         $this->warn('Updating permissions...');
 
-        $bar = $this->output->createProgressBar($total + 1);
-
-        $bar->setFormat('Progress: [%bar%] %percent:3s%% %elapsed:6s%/%estimated:-6s% %memory:6s%');
-
-        $bar->start();
+        $bar = $this->startProgressBar($total);
 
         $stored = [];
 
         foreach ($permissions as $key => $permission) {
-            $actions = $this->defaultActions;
-            $name = $permission;
+            $name = is_string($permission) ? $permission : $key;
 
-            if (is_array($permission)) {
-                $name = $key;
-                $actions = $this->getActions($permission);
-            }
+            $actions = $this->getActions($permission);
 
             foreach ($actions as $action) {
                 $stored[] = Permission::firstOrCreate([
@@ -74,34 +119,32 @@ class PermissionCommand extends Command
         $this->info('Permissions updated successfully');
     }
 
-    private function getActions($permission)
+    public function startProgressBar($total)
     {
-        if (isset($permission['strict']) && $permission['strict'] == true) {
-            $actions = $permission['actions'];
-        } else {
-            $actions = array_merge($this->defaultActions, $permission['actions']);
-        }
+        $bar = $this->output->createProgressBar($total + 1);
 
-        return $actions;
+        $bar->setFormat('Progress: [%bar%] %percent:3s%% %elapsed:6s%/%estimated:-6s% %memory:6s%');
+
+        $bar->start();
+
+        return $bar;
     }
 
-    private function countPermissions($permissions, $default)
+    public function updateSuperUserPermissions()
     {
-        $count = 0;
+        $this->warn('Updating admin permissions...');
 
-        foreach($permissions as $permission) {
+        $superUserClass = config('acl.admin.class');
 
-            if (is_string($permission)) {
-                $count += $default;
-            } elseif (isset($permission['actions'])) {
-                $count += count($permission['actions']);
+        $superUser = $superUserClass::where(config('acl.admin.username_field'), config('acl.admin.username'))->first();
 
-                if (! isset($permission['strict']) || $permission['strict'] == false) {
-                    $count += $default;
-                }
-            }
+        if ($superUser) {
+            $superUser->givePermissionTo(Permission::all()->pluck('name')->toArray());
+
+            $this->info('Admin permissions updated');
+        } else {
+            $this->error(' No admin found ');
         }
 
-        return $count;
     }
 }

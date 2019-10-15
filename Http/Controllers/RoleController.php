@@ -2,7 +2,7 @@
 
 namespace Innerent\Acl\Http\Controllers;
 
-use Innerent\Acl\Entities\Role;
+use Innerent\Acl\Models\Role;
 use Innerent\Acl\Http\Requests\RoleRequest;
 use Innerent\Acl\Services\RoleService;
 use Nwidart\Modules\Routing\Controller;
@@ -36,7 +36,7 @@ class RoleController extends Controller
     {
         $role = $this->roleService->get($role);
 
-        $this->authorize('view', $role);
+        $this->authorize('view',  $role);
 
         return response()->json($role->toArray(), 200);
     }

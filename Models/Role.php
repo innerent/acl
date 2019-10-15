@@ -1,6 +1,6 @@
 <?php
 
-namespace Innerent\Acl\Entities;
+namespace Innerent\Acl\Models;
 
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Spatie\Permission\Models\Role as SpatieRole;

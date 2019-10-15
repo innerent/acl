@@ -53,18 +53,18 @@ class RoleRequest extends FormRequest
             'name' => [
                 'required',
                 'max:255',
-                "unique:{$this->tableNames['roles']},name,{$this->internID},id,deleted_at,NULL",
+                "unique:{$this->tableNames['roles']},name,{$this->internID},id,deleted_at,NULL"
             ],
             'type' => [
                 'required',
-                'in:permissive,prohibitive',
+                'in:permissive,prohibitive'
             ],
             'description' => [
                 'required',
-                'max:255',
+                'max:255'
             ],
             'permissions' => 'required',
-            'permissions.*' => 'exists:' . $this->tableNames['permissions'] . ',id',
+            'permissions.*' => 'exists:' . $this->tableNames['permissions'] . ',id'
         ];
     }
 
@@ -73,15 +73,15 @@ class RoleRequest extends FormRequest
         return [
             'name' => [
                 'max:255',
-                "unique:{$this->tableNames['roles']},name,{$this->internID},id,deleted_at,NULL",
+                "unique:{$this->tableNames['roles']},name,{$this->internID},id,deleted_at,NULL"
             ],
             'type' => [
                 'in:permissive,prohibitive'
             ],
             'description' => [
-                'max:255',
+                'max:255'
             ],
-            'permissions.*' => 'exists:' . $this->tableNames['permissions'] . ',id',
+            'permissions.*' => 'exists:' . $this->tableNames['permissions'] . ',id'
         ];
     }
 }

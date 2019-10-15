@@ -3,8 +3,7 @@
     "alias": "acl",
     "description": "",
     "keywords": [],
-    "active": 1,
-    "order": 0,
+    "order": 1,
     "providers": [
         "Innerent\\Acl\\Providers\\AclServiceProvider"
     ],

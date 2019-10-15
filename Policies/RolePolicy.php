@@ -3,8 +3,8 @@
 namespace Innerent\Acl\Policies;
 
 use Illuminate\Auth\Access\HandlesAuthorization;
-use Innerent\Acl\Entities\Role;
-use Innerent\People\Entities\User;
+use Innerent\Acl\Models\Role;
+use Innerent\People\Models\User;
 
 class RolePolicy
 {
@@ -12,26 +12,26 @@ class RolePolicy
 
     public function index(User $user)
     {
-        return true;
+        return $user->can('role_read');
     }
 
     public function create(User $user)
     {
-        return true;
+        return $user->can('role_create');
     }
 
     public function view(User $user, Role $role)
     {
-        return true;
+        return $user->can('role_read');
     }
 
     public function update(User $user, Role $role)
     {
-        return true;
+        return $user->can('role_update');
     }
 
     public function delete(User $user, Role $role)
     {
-        return true;
+        return $user->can('role_destroy');
     }
 }

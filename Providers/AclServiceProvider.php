@@ -2,13 +2,11 @@
 
 namespace Innerent\Acl\Providers;
 
-use Illuminate\Auth\AuthServiceProvider;
-use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Database\Eloquent\Factory;
 use Innerent\Acl\Console\PermissionCommand;
-use Innerent\Acl\Contracts\Role;
-use Innerent\Acl\Entities\Role as RoleModel;
+use Innerent\Acl\Contracts\Role as RoleContract;
+use Innerent\Acl\Models\Role as RoleModel;
 use Innerent\Acl\Policies\RolePolicy;
 use Innerent\Acl\Repositories\RoleRepository;
 use Innerent\Foundation\Traits\HasPolicies;
@@ -29,6 +27,7 @@ class AclServiceProvider extends ServiceProvider
     {
         $this->registerTranslations();
         $this->registerConfig();
+        $this->registerViews();
         $this->registerFactories();
         $this->loadMigrationsFrom(__DIR__ . '/../Database/Migrations');
 
@@ -45,11 +44,11 @@ class AclServiceProvider extends ServiceProvider
         $this->app->register(RouteServiceProvider::class);
 
         $this->commands([
-            PermissionCommand::class
+            PermissionCommand::class,
         ]);
 
         $this->app->bind(
-            Role::class,
+            RoleContract::class,
             RoleRepository::class
         );
     }
@@ -67,6 +66,26 @@ class AclServiceProvider extends ServiceProvider
         $this->mergeConfigFrom(
             __DIR__.'/../Config/config.php', 'acl'
         );
+    }
+
+    /**
+     * Register views.
+     *
+     * @return void
+     */
+    public function registerViews()
+    {
+        $viewPath = resource_path('views/modules/acl');
+
+        $sourcePath = __DIR__.'/../Resources/views';
+
+        $this->publishes([
+            $sourcePath => $viewPath
+        ],'views');
+
+        $this->loadViewsFrom(array_merge(array_map(function ($path) {
+            return $path . '/modules/acl';
+        }, \Config::get('view.paths')), [$sourcePath]), 'acl');
     }
 
     /**
@@ -92,7 +111,7 @@ class AclServiceProvider extends ServiceProvider
      */
     public function registerFactories()
     {
-        if (! app()->environment('production')) {
+        if (! app()->environment('production') && $this->app->runningInConsole()) {
             app(Factory::class)->load(__DIR__ . '/../Database/factories');
         }
     }

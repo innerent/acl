@@ -1,7 +1,7 @@
 <?php
 
 use Faker\Generator as Faker;
-use Innerent\Acl\Entities\Role;
+use Innerent\Acl\Models\Role;
 use Spatie\Permission\Models\Permission;
 
 /** @var \Illuminate\Database\Eloquent\Factory $factory */

@@ -1,6 +1,6 @@
 {
     "name": "innerent/acl",
-    "description": "Roles and permissions API implementation based on spatie/laravel-permission",
+    "description": "",
     "authors": [
         {
             "name": "Marcelo Barros da Silva",

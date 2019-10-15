@@ -15,7 +15,7 @@ use Illuminate\Http\Request;
 
 Route::group([
     'middleware' => 'auth:api',
-    'prefix' => 'acl',
+    'prefix' => ''
 ], function () {
     Route::apiResource('roles', 'RoleController');
 
