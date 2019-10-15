@@ -2,6 +2,7 @@
 
 namespace Innerent\Acl\Providers;
 
+use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Database\Eloquent\Factory;
 use Innerent\Acl\Console\PermissionCommand;
@@ -9,11 +10,9 @@ use Innerent\Acl\Contracts\Role as RoleContract;
 use Innerent\Acl\Models\Role as RoleModel;
 use Innerent\Acl\Policies\RolePolicy;
 use Innerent\Acl\Repositories\RoleRepository;
-use Innerent\Foundation\Traits\HasPolicies;
 
 class AclServiceProvider extends ServiceProvider
 {
-    use HasPolicies;
 
     protected $policies = [
         RoleModel::class => RolePolicy::class
@@ -124,5 +123,12 @@ class AclServiceProvider extends ServiceProvider
     public function provides()
     {
         return [];
+    }
+
+    public function registerPolicies()
+    {
+        foreach ($this->policies as $key => $value) {
+            Gate::policy($key, $value);
+        }
     }
 }
