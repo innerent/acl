@@ -27,11 +27,12 @@ Run migrations
 php artisan migration
 ```
 
-Publish the configuration file
+Publish the configuration files
 ```
-php artisan vendor:publish
+php artisan vendor:publish --provider="Spatie\Permission\PermissionServiceProvider" --tag="config"
+
+php artisan vendor:publish --provider="Innerent\Acl\Providers\AclServiceProvider" --tag="config"
 ```
-> Select the innerent/acl provider on the list
 
 
 ## Configuration
